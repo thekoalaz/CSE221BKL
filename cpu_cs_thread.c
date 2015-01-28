@@ -4,12 +4,12 @@
 #define STACK_SIZE 1024
 #define THREAD_MAX_NUM 5
 
-int void_func(void *arg) {
+int pipe_func(void *arg) {
 
 	return 1;
 }
 
-data_t cpu_thread_creation(data_t overhead) {
+data_t cpu_cs_thread(data_t overhead) {
 	void *child_stack = malloc(STACK_SIZE);
 	unsigned start, end;
 	data_t total = 0;
@@ -18,7 +18,7 @@ data_t cpu_thread_creation(data_t overhead) {
 		
 	for(i=0 ; i<THREAD_MAX_NUM ; ++i) {
 		start = ccnt_read();
-		pid = clone(&void_func,(char*)child_stack+STACK_SIZE, CLONE_THREAD|CLONE_SIGHAND|CLONE_FS|CLONE_VM|CLONE_FILES, NULL);
+		pid = clone(&pipe_func,(char*)child_stack+STACK_SIZE, CLONE_THREAD|CLONE_SIGHAND|CLONE_FS|CLONE_VM|CLONE_FILES, NULL);
 		end = ccnt_read();
 	
 		waitpid(pid, 0, 0); //wait for children

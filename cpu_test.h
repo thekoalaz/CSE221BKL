@@ -7,7 +7,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sched.h>
 
 #include "parameter.h"
 #include "rpi_pmu.h"
@@ -18,7 +17,7 @@
 //constants
 #define OVERHEAD_TEST_NUM 10000
 #define PROCCALL_TEST_NUM 1000000
-#define TASK_CREATION_NUM 10000
+#define TASK_CREATION_NUM 7000
 #define SYSCALL_TEST_NUM 10000
 
 #define PROCCALL_ARG_NUM 7
@@ -30,6 +29,7 @@ void pmcr_init();
 //measurement functions
 data_t cpu_process_creation(data_t);
 data_t cpu_thread_creation(data_t);
+data_t cpu_cs_process(data_t);
 
 data_t* cpu_proccall_overhead(data_t ccnt_overhead);
 data_t cpu_syscall_overhead(data_t ccnt_overhead);

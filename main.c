@@ -38,9 +38,13 @@ int main()
 	syscall_test_result = cpu_syscall_overhead(ccnt_overhead);
 	printf("system call overhead time : %f\n",(float)syscall_test_result);
 
+	//Task context switching test
+	printf("Process context switching time : %f\n",(float)cpu_cs_process(ccnt_overhead));
+
 	//Task creation test
 	printf("Process creation time : %f\n",(float)cpu_process_creation(ccnt_overhead));
 	printf("Thread creation time : %f\n",(float)cpu_thread_creation(ccnt_overhead));
+
 
 	return 0;
 }
