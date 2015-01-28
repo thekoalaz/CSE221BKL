@@ -3,8 +3,7 @@
 int main()
 {
 	int i,j;
-	data_t task_creation_result = 0; 
-	data_t*proccall_test_result;
+	data_t *proccall_test_result;
 	data_t syscall_test_result;
 
 	pmcr_init();
@@ -15,9 +14,8 @@ int main()
 	printf("Reading overhead time is : %f\n", ccnt_overhead);
 	
 	//Procedure call test
-/*
 	data_t proccall_test_temp[PROCCALL_ARG_NUM+1];
-	const int TRIALS = 10000;
+	const int TRIALS = 100;
 	const int CALLS = 1;
 	for(i=0;i<TRIALS; i++){
 		proccall_test_result = cpu_proccall_overhead(ccnt_overhead);
@@ -39,13 +37,11 @@ int main()
 	//System call test
 	syscall_test_result = cpu_syscall_overhead(ccnt_overhead);
 	printf("system call overhead time : %f\n",(float)syscall_test_result);
-*/
+
 	//Task creation test
 	printf("Process creation time : %f\n",(float)cpu_process_creation(ccnt_overhead));
-	printf("Process creation test ends\n");
 	printf("Thread creation time : %f\n",(float)cpu_thread_creation(ccnt_overhead));
-	printf("Thread creation test ends\n");
-
 
 	return 0;
 }
+
