@@ -21,7 +21,7 @@ data_t get_overhead(){
 		end = ccnt_read();
 		total += (data_t)(end - start);
 #ifdef DEBUG
-		printf("%dth measurement overhead: %d\n",i, end - start);
+		//printf("%dth measurement overhead: %d\n",i, end - start);
 #endif
 	}
 #ifdef DEBUG
