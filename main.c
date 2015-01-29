@@ -17,6 +17,7 @@ int main()
 	data_t proccall_test_temp[PROCCALL_ARG_NUM+1];
 	const int TRIALS = 100;
 	const int CALLS = 1;
+
 	for(i=0;i<TRIALS; i++){
 		proccall_test_result = cpu_proccall_overhead(ccnt_overhead);
 		for(j=0;j<=PROCCALL_ARG_NUM;j++){
@@ -40,11 +41,13 @@ int main()
 
 	//Task context switching test
 	printf("Process context switching time : %f\n",(float)cpu_cs_process(ccnt_overhead));
+	fflush(stdout);
+	printf("Thread context switching time : %f\n",(float)cpu_cs_thread(ccnt_overhead));
+	fflush(stdout);
 
 	//Task creation test
 	printf("Process creation time : %f\n",(float)cpu_process_creation(ccnt_overhead));
 	printf("Thread creation time : %f\n",(float)cpu_thread_creation(ccnt_overhead));
-
 
 	return 0;
 }

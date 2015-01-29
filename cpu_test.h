@@ -30,6 +30,7 @@ void pmcr_init();
 data_t cpu_process_creation(data_t);
 data_t cpu_thread_creation(data_t);
 data_t cpu_cs_process(data_t);
+data_t cpu_cs_thread(data_t);
 
 data_t* cpu_proccall_overhead(data_t ccnt_overhead);
 data_t cpu_syscall_overhead(data_t ccnt_overhead);

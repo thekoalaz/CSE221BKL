@@ -25,7 +25,6 @@ data_t cpu_thread_creation(data_t overhead) {
 		if(pid == -1) {
 			printf("Error in waitpid()\n");
 		}
-
 		total += (end - start - overhead);
 	}
  
