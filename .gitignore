@@ -31,3 +31,6 @@ run
 #text
 *.swp
 tags
+
+#Custom helpers
+sizehelper.c
