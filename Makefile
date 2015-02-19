@@ -3,7 +3,7 @@ CFLAGS=-c -Wall -std=c++0x -g -O0
 LDFLAGS=#-lstdc++
 SOURCES=rpi_pmu.c cpu_process_creation.c cpu_thread_creation.c main.c proccall_test.c syscall_test.c pagefault_test.c memlatency.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=memtest
+EXECUTABLE=run
 
 all: $(SOURCES) $(EXECUTABLE)
 
