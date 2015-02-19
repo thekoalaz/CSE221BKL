@@ -1,17 +1,12 @@
 #include "cpu_test.h"
-#include "stats.h"
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#include <sys/mman.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <memory.h>
-#include <sys/stat.h>
 #include <math.h>
+#include <memory.h>
 
-static const int LATENCY_ACCESS_TRIALS = 1000000000;
+//static const int LATENCY_ACCESS_TRIALS = 1000000000;
+const int LATENCY_ACCESS_TRIALS = 100000000;
 //const int LATENCY_ACCESS_TRIALS = 1000000;
 //const int LATENCY_ACCESS_TRIALS = 1000;
 static const size_t INT_SIZE = sizeof(int);
@@ -47,10 +42,17 @@ static const size_t array_size13 = 256*8192;
 static const size_t array_size14 = 256*16384;
 //8MB
 static const size_t array_size15 = 256*32768;
+//16MB
+static const size_t array_size16 = 256*65536;
+//32MB
+static const size_t array_size17 = 256*pow(2,17);
+//64MB
+static const size_t array_size18 = 256*pow(2,18);
+
 
 data_t memory_latency_helper(data_t, size_t);
 void make_cyclic_array(void *, size_t);
-
+unsigned int uniform_rand(unsigned int);
 
 data_t memory_latency(data_t ccnt_overhead)
 {
@@ -70,6 +72,9 @@ data_t memory_latency(data_t ccnt_overhead)
 	memory_latency_helper(ccnt_overhead, array_size13);
 	memory_latency_helper(ccnt_overhead, array_size14);
 	memory_latency_helper(ccnt_overhead, array_size15);
+	memory_latency_helper(ccnt_overhead, array_size16);
+	memory_latency_helper(ccnt_overhead, array_size17);
+	memory_latency_helper(ccnt_overhead, array_size18);
 
 	return 0;
 }
@@ -122,13 +127,20 @@ void make_cyclic_array(void * array, size_t size)
 		ptrarray[i] = &ptrarray[i];
 	}
 
-	srand(0);
+	srand(time(NULL));
 	for (unsigned int i=arraysize-1; i>0; i--)
 	{
-		unsigned int swp = rand() % arraysize;
+		unsigned int swp = uniform_rand(arraysize);
 		void * tmp = ptrarray[i];
 		ptrarray[i] = ptrarray[swp];
 		ptrarray[swp] = tmp;
 	}
+}
+
+unsigned int uniform_rand(unsigned int range)
+{
+    double myRand = rand()/(1.0 + RAND_MAX); 
+	unsigned int myRand_scaled = myRand * (range + 1);
+	return myRand_scaled;
 }
 
