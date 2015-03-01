@@ -5,8 +5,6 @@ int main()
 	int i,j;
 	data_t *proccall_test_result;
 	data_t syscall_test_result;
-	data_t pagefault_result;
-	data_t memlatency_result;
 
 	pmcr_init();
 
@@ -15,7 +13,6 @@ int main()
 	ccnt_overhead = get_overhead();
 	printf("Reading overhead time is : %f\n", ccnt_overhead);
 	
-	/*
 	//Procedure call test
 	data_t proccall_test_temp[PROCCALL_ARG_NUM+1];
 	const int TRIALS = 1;
@@ -44,11 +41,6 @@ int main()
 	//Task creation test
 	printf("Process creation time : %f\n",(float)cpu_process_creation(ccnt_overhead));
 	printf("Thread creation time : %f\n",(float)cpu_thread_creation(ccnt_overhead));
-	
-	*/
-	memlatency_result = memory_latency(ccnt_overhead);
-	//pagefault_result = pagefault_test(ccnt_overhead);	
-
 
 	return 0;
 }
