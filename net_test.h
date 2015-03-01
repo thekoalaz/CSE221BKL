@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,7 +19,8 @@
 //constants
 #define CLIENT_IP "132.239.10.230"
 #define SERVER_IP "132.239.10.66"
-#define SOCKETNO 2222;
+#define SOCKETNO 2222
+#define WINDOWSIZE 163840
 
 //pmu functions
 data_t get_overhead();
