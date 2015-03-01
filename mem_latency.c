@@ -1,7 +1,5 @@
 #include "cpu_test.h"
 #include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 #include <memory.h>
 
@@ -89,11 +87,10 @@ data_t memory_latency(data_t ccnt_overhead)
 data_t memory_latency_helper(data_t ccnt_overhead, size_t size, unsigned int stride)
 {
 	unsigned start, end;
-	float avg=0;
-	float max = 0; 
+	float avg = 0.0;
+	float stddev = 0.0;
+	float max = 0.0; 
     float min = 10000.0;
-	float squares_total = 0;
-	float stddev;
 
 	int * array = (int *) malloc((size_t) size);
 	if(array == NULL)
@@ -112,12 +109,14 @@ data_t memory_latency_helper(data_t ccnt_overhead, size_t size, unsigned int str
 		end = ccnt_read();
 
 		float latency = (end-start) - ccnt_overhead ;
-		avg += latency / LATENCY_ACCESS_TRIALS;
-		squares_total += latency * latency;
+		float prev_avg = avg;
+		unsigned int k = i + 1;
+		avg += (latency - avg) / k;
+		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
 		if(latency > max) { max = latency; }
 		if(latency < min) { min = latency; }
 	}
-	stddev = sqrt(squares_total / LATENCY_ACCESS_TRIALS - avg * avg);
+	stddev = sqrt(stddev);
 	printf("Size: %u\t Average Access Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
 			size, avg, max, min, stddev);
 	printf("Value: %#010x\n", *cur);

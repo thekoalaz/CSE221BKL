@@ -6,8 +6,11 @@
 #include <sys/socket.h>
 
 //constants
+#define CLIENT_IP = "132.239.10.230"
+#define SERVER_IP = "132.239.10.66"
 
-//pmu functions
+//network functions
+
 
 //measurement functions
 
