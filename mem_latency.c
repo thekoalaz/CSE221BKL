@@ -1,15 +1,13 @@
-#include "cpu_test.h"
+#include "mem_test.h"
 #include <time.h>
 #include <math.h>
 #include <memory.h>
 
-//static const unsigned int LATENCY_ACCESS_TRIALS = 1000000000;
 static const unsigned int LATENCY_ACCESS_TRIALS = 100000000;
-//static const unsigned int LATENCY_ACCESS_TRIALS = 1000000;
-//static const unsigned int LATENCY_ACCESS_TRIALS = 1000;
 static const size_t INT_SIZE = sizeof(int);
 static const unsigned int STRIDE_TRIALS = 10;
 static const unsigned int STRIDE_START = 128;
+
 //256B
 static const size_t array_size0 = 256;
 //512B
