@@ -1,3 +1,7 @@
 #include "net_test.h"
-#include "rpi_pmu.h"
 
+data_t peakbandwidth_client(data_t ccnt_overhead)
+{
+	char buffer[256];
+
+}

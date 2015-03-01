@@ -22,12 +22,6 @@ data_t get_overhead();
 void pmcr_init();
 
 //measurement functions
-data_t cpu_process_creation(data_t);
-data_t cpu_thread_creation(data_t);
-
-data_t* cpu_proccall_overhead(data_t ccnt_overhead);
-data_t cpu_syscall_overhead(data_t ccnt_overhead);
-
 data_t memory_RAM_access();
 data_t memory_latency(data_t);
 data_t memory_RAM_bandwidth();
