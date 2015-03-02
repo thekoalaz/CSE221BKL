@@ -117,7 +117,6 @@ data_t memory_latency_helper(data_t ccnt_overhead, size_t size, unsigned int str
 	stddev = sqrt(stddev);
 	printf("Size: %u\t Average Access Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
 			size, avg, max, min, stddev);
-	printf("Value: %#010x\n", *cur);
 	free(array);
 	return 0;
 }

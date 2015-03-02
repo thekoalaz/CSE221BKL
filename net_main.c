@@ -11,7 +11,7 @@ int main()
 	ccnt_overhead = get_overhead();
 	printf("Reading overhead time is : %f\n", ccnt_overhead);
 	
-	peakbandwidth_result = peakbandwidth_client(ccnt_overhead);
+	peakbandwidth_result = peakbandwidth(ccnt_overhead);
 
 	return 0;
 }
