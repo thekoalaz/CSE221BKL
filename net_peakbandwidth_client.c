@@ -13,6 +13,11 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
     struct sockaddr_in serv_addr;
     struct hostent *server;
 	data_t start, end;
+	float total = 0.0;
+	float avg = 0.0;
+	float stddev = 0.0;
+	float max = 0.0; 
+    float min = 10000000.0;
 
     char buffer[WINDOWSIZE];
     portno = SOCKETNO;
@@ -41,6 +46,7 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 	{
 		buffer[i] = (char) rand() + 1;
 	}
+
 	for(int i=0; i<SEND_COUNT; i++)
 	{
 		start = ccnt_read();
@@ -52,10 +58,49 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 		end = ccnt_read();
 		if (n < 0) 
 			error("ERROR reading from socket");
-		//printf("%s\n",buffer);
-		printf("%f\n", (end-start) - ccnt_overhead);
+		printf("Message returned\n");
+
+		float latency = (end-start) - ccnt_overhead ;
+		printf("%f\n", latency);
+		float prev_avg = avg;
+		unsigned int k = i + 1;
+		total += latency;
+		avg += (latency - avg) / k;
+		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
+		if(latency > max) { max = latency; }
+		if(latency < min) { min = latency; }
 	}
+	stddev = sqrt(stddev);
+	printf("Total: %f\t Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
+			total, avg, max, min, stddev);
     close(sockfd);
-    return 0.0;
+    return total;
+}
+
+data_t peakbandwidth(data_t ccnt_overhead)
+{
+	float avg = 0.0;
+	float stddev = 0.0;
+	float max = 0.0; 
+    float min = 1000000000.0;
+
+	for(int i=0; i<TRIAL_COUNT; i++)
+	{
+		sleep(3);
+
+		float latency = peakbandwidth_client(ccnt_overhead);
+		float prev_avg = avg;
+		unsigned int k = i + 1;
+		avg += (latency - avg) / k;
+		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
+		if(latency > max) { max = latency; }
+		if(latency < min) { min = latency; }
+	}
+
+	stddev = sqrt(stddev);
+	printf("Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
+			avg, max, min, stddev);
+
+	return avg;
 }
 

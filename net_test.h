@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,15 +22,16 @@
 #define SERVER_IP "132.239.10.66"
 #define SOCKETNO 2222
 #define WINDOWSIZE 163840
+#define TRIAL_COUNT 10
 
-static const int SEND_COUNT = (int) (1024 * 1024) / WINDOWSIZE;
+static const int SEND_COUNT = (int) (1024 * 1024) / WINDOWSIZE + 1;
 
 //pmu functions
 data_t get_overhead();
 void pmcr_init();
 
 //measurement functions
-data_t peakbandwidth_client(data_t);
+data_t peakbandwidth(data_t);
 
 #endif
 
