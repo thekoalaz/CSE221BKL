@@ -22,6 +22,8 @@
 #define SOCKETNO 2222
 #define WINDOWSIZE 163840
 
+static const int SEND_COUNT = (int) (1024 * 1024) / WINDOWSIZE;
+
 //pmu functions
 data_t get_overhead();
 void pmcr_init();
