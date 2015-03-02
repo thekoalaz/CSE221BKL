@@ -7,7 +7,7 @@ void error(const char *msg)
 	exit(0);
 }
 
-data_t peakbandwidth_client(data_t ccnt_overhead)
+data_t peakbandwidth_client(data_t ccnt_overhead, char const * servername)
 {
 	int sockfd, portno, n;
 	struct sockaddr_in serv_addr;
@@ -24,7 +24,7 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) 
 	   error("ERROR opening socket");
-	server = gethostbyname(SERVER_IP);
+	server = gethostbyname(servername);
 	if (server == NULL) {
 	   fprintf(stderr,"ERROR, no such host\n");
 	   exit(0);
@@ -37,10 +37,8 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 	serv_addr.sin_port = htons(portno);
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
 	   error("ERROR connecting");
-	//printf("Please enter the message: ");
+
 	bzero(buffer,WINDOWSIZE);
-	//fgets(buffer,WINDOWSIZE-1,stdin);
-	printf("%ld\n", (long) time(NULL));
 	srand((long) time(NULL));
 	for (int i=0; i<WINDOWSIZE-1; i++)
 	{
@@ -49,6 +47,7 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 
 	for(int i=0; i<SEND_COUNT; i++)
 	{
+		if(i!=0) sleep(1);
 		start = ccnt_read();
 		n = write(sockfd,buffer,strlen(buffer));
 		if (n < 0) 
@@ -84,25 +83,53 @@ data_t peakbandwidth(data_t ccnt_overhead)
 	float max = 0.0; 
 	float min = 1000000000.0;
 
+	//Local
+	printf("Local test\n");
 	for(int i=0; i<TRIAL_COUNT; i++)
 	{
 		printf("Trial %d\n", (i+1));
 		//Give time for server to setup.
-		if(i != 0) sleep(15);
+		if(i != 0) sleep(10);
 
-		float latency = peakbandwidth_client(ccnt_overhead);
+		float latency = peakbandwidth_client(ccnt_overhead, "localhost");
 		float prev_avg = avg;
 		unsigned int k = i + 1;
 		avg += (latency - avg) / k;
 		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
 		if(latency > max) { max = latency; }
 		if(latency < min) { min = latency; }
+		printf("Cumulative Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
+			avg, max, min, stddev);
 		printf("======================================================================\n");
 	}
 
 	stddev = sqrt(stddev);
 	printf("Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
 			avg, max, min, stddev);
+
+	//Remote
+	printf("Remote test\n");
+	for(int i=0; i<TRIAL_COUNT; i++)
+	{
+		printf("Trial %d\n", (i+1));
+		//Give time for server to setup.
+		if(i != 0) sleep(10);
+
+		float latency = peakbandwidth_client(ccnt_overhead, SERVER_IP);
+		float prev_avg = avg;
+		unsigned int k = i + 1;
+		avg += (latency - avg) / k;
+		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
+		if(latency > max) { max = latency; }
+		if(latency < min) { min = latency; }
+		printf("Cumulative Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
+			avg, max, min, stddev);
+		printf("======================================================================\n");
+	}
+
+	stddev = sqrt(stddev);
+	printf("Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
+		avg, max, min, stddev);
 
 	return avg;
 }

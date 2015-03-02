@@ -24,7 +24,7 @@
 #define WINDOWSIZE 163840
 #define TRIAL_COUNT 10
 
-static const int SEND_COUNT = (int) (1024 * 1024) / WINDOWSIZE + 1;
+static const int SEND_COUNT = (int) (10 * 1024 * 1024) / WINDOWSIZE + 1;
 
 //pmu functions
 data_t get_overhead();

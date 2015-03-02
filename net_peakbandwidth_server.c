@@ -6,13 +6,27 @@ void error(const char *msg)
 	exit(0);
 }
 
+void respond_to_client(int sock)
+{
+	int n;
+	for(int i=0; i<SEND_COUNT; i++)
+	{
+		char buffer[WINDOWSIZE];
+
+		bzero(buffer,WINDOWSIZE);
+		n = read(sock,buffer,WINDOWSIZE-1);
+		if (n < 0) error("ERROR reading from socket");
+		n = write(sock,"I got your message",18);
+		if (n < 0) error("ERROR writing to socket");
+		printf("Message received.\n");
+	}
+}
+
 void peakbandwidth_server()
 {
-	int sockfd, newsockfd, portno;
+	int sockfd, newsockfd, portno, pid;
 	socklen_t clilen;
-	char buffer[WINDOWSIZE];
 	struct sockaddr_in serv_addr, cli_addr;
-	int n;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) 
@@ -28,29 +42,27 @@ void peakbandwidth_server()
 	listen(sockfd,5);
 	clilen = sizeof(cli_addr);
 
-	for(int i=0; i<SEND_COUNT * TRIAL_COUNT; i++)
+	int i=0;
+	while(1)
 	{
-		if(i%SEND_COUNT == 0)
-		{
-			printf("======================================================================\n");
-			printf("Probably in trial %d\n",
-					(((int) i / SEND_COUNT) + 1));
-			printf("Starting server.\n");
-			newsockfd = accept(sockfd, 
-					  (struct sockaddr *) &cli_addr, 
-					  &clilen);
-			if (newsockfd < 0) 
-				error("ERROR on accept");
-			printf("Server started.\n");
+		printf("======================================================================\n");
+		printf("Starting connection.\n");
+		newsockfd = accept(sockfd, 
+				  (struct sockaddr *) &cli_addr, 
+				  &clilen);
+		if (newsockfd < 0) 
+			error("ERROR on accept");
+		printf("Connection started.\n");
+		i++; printf("Probably in trial %d\n", i);
+		pid = fork();
+		if (pid < 0) error("ERROR on fork");
+		if (pid == 0) {
+			close(sockfd);
+			respond_to_client(newsockfd);
+			exit(0);
 		}
-		bzero(buffer,WINDOWSIZE);
-		n = read(newsockfd,buffer,255);
-		if (n < 0) error("ERROR reading from socket");
-		n = write(newsockfd,"I got your message",18);
-		if (n < 0) error("ERROR writing to socket");
-		printf("Message received.\n");
+		else close(newsockfd);
 	}
-	close(newsockfd);
 	close(sockfd);
 	return; 
 }
