@@ -10,36 +10,36 @@ void error(const char *msg)
 data_t peakbandwidth_client(data_t ccnt_overhead)
 {
 	int sockfd, portno, n;
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
+	struct sockaddr_in serv_addr;
+	struct hostent *server;
 	data_t start, end;
 	float total = 0.0;
 	float avg = 0.0;
 	float stddev = 0.0;
 	float max = 0.0; 
-    float min = 10000000.0;
+	float min = 10000000.0;
 
-    char buffer[WINDOWSIZE];
-    portno = SOCKETNO;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
-       error("ERROR opening socket");
-    server = gethostbyname(SERVER_IP);
-    if (server == NULL) {
-       fprintf(stderr,"ERROR, no such host\n");
-       exit(0);
-    }
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr, 
-        (char *)&serv_addr.sin_addr.s_addr,
-        server->h_length);
-    serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-       error("ERROR connecting");
-    //printf("Please enter the message: ");
-    bzero(buffer,WINDOWSIZE);
-    //fgets(buffer,WINDOWSIZE-1,stdin);
+	char buffer[WINDOWSIZE];
+	portno = SOCKETNO;
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) 
+	   error("ERROR opening socket");
+	server = gethostbyname(SERVER_IP);
+	if (server == NULL) {
+	   fprintf(stderr,"ERROR, no such host\n");
+	   exit(0);
+	}
+	bzero((char *) &serv_addr, sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	bcopy((char *)server->h_addr, 
+		(char *)&serv_addr.sin_addr.s_addr,
+		server->h_length);
+	serv_addr.sin_port = htons(portno);
+	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+	   error("ERROR connecting");
+	//printf("Please enter the message: ");
+	bzero(buffer,WINDOWSIZE);
+	//fgets(buffer,WINDOWSIZE-1,stdin);
 	printf("%ld\n", (long) time(NULL));
 	srand((long) time(NULL));
 	for (int i=0; i<WINDOWSIZE-1; i++)
@@ -73,8 +73,8 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
 	stddev = sqrt(stddev);
 	printf("Total: %f\t Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
 			total, avg, max, min, stddev);
-    close(sockfd);
-    return total;
+	close(sockfd);
+	return total;
 }
 
 data_t peakbandwidth(data_t ccnt_overhead)
@@ -82,11 +82,11 @@ data_t peakbandwidth(data_t ccnt_overhead)
 	float avg = 0.0;
 	float stddev = 0.0;
 	float max = 0.0; 
-    float min = 1000000000.0;
+	float min = 1000000000.0;
 
 	for(int i=0; i<TRIAL_COUNT; i++)
 	{
-		sleep(3);
+		printf("Trial %d\n", (i+1));
 
 		float latency = peakbandwidth_client(ccnt_overhead);
 		float prev_avg = avg;
@@ -95,6 +95,8 @@ data_t peakbandwidth(data_t ccnt_overhead)
 		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
 		if(latency > max) { max = latency; }
 		if(latency < min) { min = latency; }
+		sleep(3);
+		printf("======================================================================\n");
 	}
 
 	stddev = sqrt(stddev);
