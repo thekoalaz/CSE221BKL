@@ -35,7 +35,7 @@ data_t peakbandwidth_client(data_t ccnt_overhead)
     //printf("Please enter the message: ");
     bzero(buffer,WINDOWSIZE);
     //fgets(buffer,WINDOWSIZE-1,stdin);
-	printf("%ld\n" (long) time(NULL));
+	printf("%ld\n", (long) time(NULL));
 	srand((long) time(NULL));
 	for (int i=0; i<WINDOWSIZE-1; i++)
 	{
