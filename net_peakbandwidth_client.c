@@ -87,6 +87,8 @@ data_t peakbandwidth(data_t ccnt_overhead)
 	for(int i=0; i<TRIAL_COUNT; i++)
 	{
 		printf("Trial %d\n", (i+1));
+		//Give time for server to setup.
+		if(i != 0) sleep(15);
 
 		float latency = peakbandwidth_client(ccnt_overhead);
 		float prev_avg = avg;
@@ -95,7 +97,6 @@ data_t peakbandwidth(data_t ccnt_overhead)
 		stddev += ((float) (k-1))/k * (latency - prev_avg) * (latency - prev_avg);
 		if(latency > max) { max = latency; }
 		if(latency < min) { min = latency; }
-		sleep(3);
 		printf("======================================================================\n");
 	}
 
