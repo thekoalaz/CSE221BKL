@@ -33,13 +33,15 @@ void peakbandwidth_server()
 		if(i%SEND_COUNT == 0)
 		{
 			printf("======================================================================\n");
-			printf("Probably in trial %d\n", (int) (i / TRIAL_COUNT + 1));
+			printf("Probably in trial %d\n",
+					(((int) i / SEND_COUNT) + 1));
 			printf("Starting server.\n");
 			newsockfd = accept(sockfd, 
 					  (struct sockaddr *) &cli_addr, 
 					  &clilen);
 			if (newsockfd < 0) 
 				error("ERROR on accept");
+			printf("Server started.\n");
 		}
 		bzero(buffer,WINDOWSIZE);
 		n = read(newsockfd,buffer,255);
