@@ -94,6 +94,7 @@ data_t peakbandwidth(data_t ccnt_overhead)
 		if(i != 0) sleep(10);
 
 		float latency = peakbandwidth_client(ccnt_overhead, "localhost");
+		if(latency < 0) { continue; }
 		float prev_avg = avg;
 		unsigned int k = i + 1;
 		avg += (latency - avg) / k;
@@ -118,6 +119,7 @@ data_t peakbandwidth(data_t ccnt_overhead)
 		if(i != 0) sleep(5);
 
 		float latency = peakbandwidth_client(ccnt_overhead, SERVER_IP);
+		if(latency < 0) { continue; }
 		float prev_avg = avg;
 		unsigned int k = i + 1;
 		avg += (latency - avg) / k;
