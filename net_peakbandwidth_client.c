@@ -45,22 +45,23 @@ data_t peakbandwidth_client(data_t ccnt_overhead, char const * servername)
 		buffer[i] = (char) rand() + 1;
 	}
 
+	printf("Responding...");
 	for(int i=0; i<SEND_COUNT; i++)
 	{
+		printf("\r");
 		if(i!=0) sleep(1);
 		start = ccnt_read();
 		n = write(sockfd,buffer,strlen(buffer));
 		if (n < 0) 
 			error("ERROR writing to socket");
-
 		n = read(sockfd,buffer,WINDOWSIZE-1);
-		end = ccnt_read();
 		if (n < 0) 
 			error("ERROR reading from socket");
-		printf("Message returned\n");
+		end = ccnt_read();
+		printf("Message returned. %d", i);
 
 		float latency = (end-start) - ccnt_overhead ;
-		printf("%f\n", latency);
+		//printf("%f\n", latency);
 		float prev_avg = avg;
 		unsigned int k = i + 1;
 		total += latency;
@@ -69,6 +70,7 @@ data_t peakbandwidth_client(data_t ccnt_overhead, char const * servername)
 		if(latency > max) { max = latency; }
 		if(latency < min) { min = latency; }
 	}
+	printf("\n");
 	stddev = sqrt(stddev);
 	printf("Total: %f\t Average Send Time: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
 			total, avg, max, min, stddev);
@@ -113,7 +115,7 @@ data_t peakbandwidth(data_t ccnt_overhead)
 	{
 		printf("Trial %d\n", (i+1));
 		//Give time for server to setup.
-		if(i != 0) sleep(10);
+		if(i != 0) sleep(5);
 
 		float latency = peakbandwidth_client(ccnt_overhead, SERVER_IP);
 		float prev_avg = avg;

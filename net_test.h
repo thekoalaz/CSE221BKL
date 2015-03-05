@@ -21,7 +21,8 @@
 #define CLIENT_IP "132.239.10.230"
 #define SERVER_IP "132.239.10.66"
 #define SOCKETNO 2222
-#define WINDOWSIZE 163840
+//#define WINDOWSIZE 163840
+#define WINDOWSIZE 163840 * 8
 #define TRIAL_COUNT 10
 
 static const int SEND_COUNT = (int) (10 * 1024 * 1024) / WINDOWSIZE + 1;

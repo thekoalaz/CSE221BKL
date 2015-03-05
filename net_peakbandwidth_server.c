@@ -9,8 +9,10 @@ void error(const char *msg)
 void respond_to_client(int sock)
 {
 	int n;
+	printf("Responding...");
 	for(int i=0; i<SEND_COUNT; i++)
 	{
+		printf("\r");
 		char buffer[WINDOWSIZE];
 
 		bzero(buffer,WINDOWSIZE);
@@ -18,8 +20,9 @@ void respond_to_client(int sock)
 		if (n < 0) error("ERROR reading from socket");
 		n = write(sock,"I got your message",18);
 		if (n < 0) error("ERROR writing to socket");
-		printf("Message received.\n");
+		printf("Message received. %d", i);
 	}
+	printf("\n");
 }
 
 void peakbandwidth_server()
@@ -43,15 +46,15 @@ void peakbandwidth_server()
 	clilen = sizeof(cli_addr);
 
 	int i=0;
+	printf("Starting server.\n");
 	while(1)
 	{
-		printf("======================================================================\n");
-		printf("Starting connection.\n");
 		newsockfd = accept(sockfd, 
 				  (struct sockaddr *) &cli_addr, 
 				  &clilen);
 		if (newsockfd < 0) 
 			error("ERROR on accept");
+		printf("======================================================================\n");
 		printf("Connection started.\n");
 		i++; printf("Probably in trial %d\n", i);
 		pid = fork();
