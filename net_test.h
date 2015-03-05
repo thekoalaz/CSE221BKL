@@ -18,9 +18,9 @@
 #define DEBUG
 
 //constants
-#define CLIENT_IP "132.239.10.230"
-#define SERVER_IP "132.239.10.66"
-#define SOCKETNO 2222
+#define CLIENT_IP "76.167.145.48"
+#define SERVER_IP "76.167.145.48"
+#define SOCKETNO 2223
 //#define WINDOWSIZE 163840
 #define WINDOWSIZE 163840 * 8
 #define TRIAL_COUNT 10
