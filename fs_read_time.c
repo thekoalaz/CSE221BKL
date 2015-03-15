@@ -6,12 +6,13 @@ static const unsigned int FS_READ_TRIALS = 10;
 static const unsigned int BLOCK_SIZE = 4;
 static const unsigned int START_SIZE = BLOCK_SIZE;
 // 512MB
-static const unsigned int END_SIZE = 512 * 1024;
+static const unsigned int END_SIZE = 256 * 1024;
 static const unsigned int STRIDE = 2;
 
-int main()
+int main(int argc, char * argv[])
 {
 	data_t fs_read_time_result;
+	printf("yo\n");
 
 	pmcr_init();
 
@@ -20,21 +21,33 @@ int main()
 	ccnt_overhead = get_overhead();
 	printf("Reading overhead time is : %f\n", ccnt_overhead);
 	
+	printf("Local Sequential\n");
 	for(unsigned int size=START_SIZE; size < END_SIZE+1; size *=STRIDE)
 	{
-		fs_read_time_result = readtime(ccnt_overhead, size, false);
+		fs_read_time_result = readtime(ccnt_overhead, size, false, false);
 	}
-	printf("%f\n", fs_read_time_result);
+	printf("Local Random\n");
 	for(unsigned int size=START_SIZE; size < END_SIZE+1; size *=STRIDE)
 	{
-		fs_read_time_result = readtime(ccnt_overhead, size, true);
+		fs_read_time_result = readtime(ccnt_overhead, size, true, false);
 	}
-	printf("%f\n", fs_read_time_result);
+
+	printf("Remote Sequential\n");
+	for(unsigned int size=START_SIZE; size < END_SIZE+1; size *=STRIDE)
+	{
+		fs_read_time_result = readtime(ccnt_overhead, size, false, true);
+	}
+	printf("Remote Random\n");
+	for(unsigned int size=START_SIZE; size < END_SIZE+1; size *=STRIDE)
+	{
+		fs_read_time_result = readtime(ccnt_overhead, size, true, true);
+	}
+
 
 	return 0;
 }
 
-data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read)
+data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool remote_read)
 {
 	int fd;
 	data_t start, end;
@@ -46,14 +59,23 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read)
 
 	char filename[32]; 
 	char buf[BLOCK_SIZE * 1024];
-	sprintf(filename, FILENAME, size);
+	if(remote_read)
+	{
+		sprintf(filename, REMOTE_FILENAME, size);
+	}
+	else
+	{
+		sprintf(filename, FILENAME, size);
+	}
 	printf("%uKB: \t\t", size);
 
-	for(unsigned int i=0; i<FS_READ_TRIALS; i++)
+	unsigned int i;
+	int retry_count = 0;
+	for(i=0; i<FS_READ_TRIALS; i++)
 	{
 		if((fd = open(filename, O_SYNC)) == -1 ) 
 		{
-			printf("Open error\n");
+			printf("%s: Open error\n", filename);
 			exit(1);
 		}
 
@@ -89,6 +111,9 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read)
 		if(accum < 0)
 		{
 			i -=1;
+			retry_count++;
+			printf("\nRetry count:%d", retry_count);
+			if(retry_count > 15) break;
 			continue;
 		}
 		float prev_avg = avg;
@@ -100,9 +125,15 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read)
 		if(accum < min) { min = accum; }
 	}
 
-	stddev = sqrt(stddev/FS_READ_TRIALS);
-	printf("Average: %f\t Max: %f\t Min: %f\t Std. Dev: %f\n",
-			avg, max, min, stddev);
+	//int trial_count = FS_READ_TRIALS + retry_count;
+	if(retry_count > 0) printf("\n\t\t");
+	stddev = sqrt(stddev/i);
+	printf("Average: %f\tMax: %f\tMin: %f\tStd. Dev: %f\tTrial Count: %d\n",
+			avg, max, min, stddev, i);
+	unsigned int block_count = size / BLOCK_SIZE;
+
+	printf("Per Block\tAverage: %f\tMax: %f\tMin: %f\tStd. Dev: %f\tTrial Count: %d\n",
+			avg/block_count, max/block_count, min/block_count, stddev/block_count, i);
 
 	close(fd);
 

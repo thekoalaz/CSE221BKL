@@ -17,11 +17,10 @@
 
 //debugging variables
 #define DEBUG
-#define MIN_SIZE
-
-#define FILENAME "test_files/%dK.img"
 
 //constants
+#define FILENAME "test_files/%dK.img"
+#define REMOTE_FILENAME "remote_test_files/%dK.img"
 
 
 //pmu functions
@@ -29,7 +28,7 @@ data_t get_overhead();
 void pmcr_init();
 
 //measurement functions
-data_t readtime(data_t, unsigned int, bool);
+data_t readtime(data_t, unsigned int, bool, bool);
 
 #endif
 
