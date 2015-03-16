@@ -58,7 +58,8 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool 
 	float min = 1000000000000.0;
 
 	char filename[32]; 
-	char buf[BLOCK_SIZE * 1024];
+	char * buf;
+	posix_memalign((void **)&buf, 512, BLOCK_SIZE * 1024 * 2);
 	if(remote_read)
 	{
 		sprintf(filename, REMOTE_FILENAME, size);
@@ -73,9 +74,15 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool 
 	int retry_count = 0;
 	for(i=0; i<FS_READ_TRIALS; i++)
 	{
-		if((fd = open(filename, O_SYNC)) == -1 ) 
+		system("echo 3 > /proc/sys/vm/drop_caches\n");
+		if(remote_read)
+		{
+			system("umount ./remote_test_files > tmp && mount -t nfs 76.167.145.48:/remote ./remote_test_files > tmp\n");
+		}
+		if((fd = open(filename, O_SYNC|O_DIRECT)) == -1 ) 
 		{
 			printf("%s: Open error\n", filename);
+			printf("%s\n", strerror(errno));
 			exit(1);
 		}
 
@@ -91,6 +98,7 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool 
 				if(lseek(fd, offset * BLOCK_SIZE * 1024, SEEK_SET) == -1)
 				{
 					printf("Seek error\n");
+					printf("%s\n", strerror(errno));
 					exit(1);
 				}
 			}
@@ -99,6 +107,7 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool 
 			if(s == -1)
 			{
 				printf("Read error\n");
+				printf("%s\n", strerror(errno));
 				exit(1);
 			}
 			end = ccnt_read();
@@ -123,19 +132,19 @@ data_t readtime(data_t ccnt_overhead, unsigned int size, bool random_read, bool 
 		stddev += ((float) (k-1))/k * (accum - prev_avg) * (accum - prev_avg);
 		if(accum > max) { max = accum; }
 		if(accum < min) { min = accum; }
+
+		close(fd);
 	}
 
 	//int trial_count = FS_READ_TRIALS + retry_count;
 	if(retry_count > 0) printf("\n\t\t");
 	stddev = sqrt(stddev/i);
-	printf("Average: %f\tMax: %f\tMin: %f\tStd. Dev: %f\tTrial Count: %d\n",
+	printf("Average: %.3f\tMax: %.3f\tMin: %.3f\tStd. Dev: %.3f\tTrial Count: %d\n",
 			avg, max, min, stddev, i);
 	unsigned int block_count = size / BLOCK_SIZE;
 
-	printf("Per Block\tAverage: %f\tMax: %f\tMin: %f\tStd. Dev: %f\tTrial Count: %d\n",
+	printf("Per Block\tAverage: %.3f\tMax: %.3f\tMin: %.3f\tStd. Dev: %.3f\tTrial Count: %d\n",
 			avg/block_count, max/block_count, min/block_count, stddev/block_count, i);
-
-	close(fd);
 
 	return avg;
 }
